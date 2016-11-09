@@ -1,0 +1,53 @@
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+
+    upstream app_front_static {
+        server UPSTREAM_HOSTPORT;
+    }
+
+    include mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 65;
+
+    ldap_server ldapserver {
+        url ldaps:LDAP_SERVER?uid?sub?(objectClass=person);
+        binddn LDAP_USERNAME;
+        binddn_passwd LDAP_PASSWORD;
+        require valid_user;
+        satisfy all;
+    }
+
+    server {
+
+        listen 80;
+        server_name localhost;
+
+        error_log  /var/log/nginx/error.log debug;
+        access_log /var/log/nginx/access.log;
+
+        auth_ldap "Forbidden";
+        auth_ldap_servers ldapserver;
+
+        location / {
+            #root html;
+            #index index.html index.htm;
+
+	    proxy_pass http://app_front_static;
+        }
+
+        error_page 500 502 503 504  /50x.html;
+        location = /50x.html {
+            root html;
+        }
+
+    }
+
+}
+

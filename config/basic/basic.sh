@@ -1,0 +1,9 @@
+#!/bin/bash
+
+NGINX_TEMPLATE=nginx.conf.template
+NGINX_CONF=nginx.conf
+
+sed "s/UPSTREAM_HOSTPORT/${UPSTREAM_HOSTPORT}/g; 
+     s~LDAP_SERVER~${LDAP_SERVER}~g; 
+     s/LDAP_USERNAME/${LDAP_USERNAME}/g; 
+     s/LDAP_PASSWORD/${LDAP_PASSWORD}/g" $NGINX_TEMPLATE > $NGINX_CONF
